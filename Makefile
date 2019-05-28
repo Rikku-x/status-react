@@ -41,7 +41,7 @@ endif
 
 clean: SHELL := /bin/sh
 clean: ##@prepare Remove all output folders
-	git clean -dxf -f
+	test -d node_modules && chmod -R u+w node_modules; git clean -dxf -f
 
 clean-nix: SHELL := /bin/sh
 clean-nix: ##@prepare Remove complete nix setup

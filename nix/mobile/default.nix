@@ -9,7 +9,7 @@ let
     version = "10.1";
   };
   xcodeWrapper = composeXcodeWrapper xcodewrapperArgs;
-  androidPlatform = callPackage ./android.nix { inherit config gradle; };
+  androidPlatform = callPackage ./android.nix { inherit config pkgs nodejs gradle status-go; };
   selectedSources =
     [ status-go ] ++
     lib.optional platform.targetAndroid androidPlatform;

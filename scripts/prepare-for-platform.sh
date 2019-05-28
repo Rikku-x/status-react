@@ -44,33 +44,29 @@ fi
 
 $GIT_ROOT/scripts/run-environment-check.sh $1
 
-if [ ! -f .babelrc ] || [ $(readlink .babelrc) != "${PLATFORM_FOLDER}/.babelrc" ]; then
-  echo "Creating link: package.json -> ${PLATFORM_FOLDER}/package.json.orig"
-  ln -sf ${PLATFORM_FOLDER}/package.json.orig package.json
+if [ "$1" != 'android' ]; then
+  if [ ! -f .babelrc ] || [ $(readlink .babelrc) != "${PLATFORM_FOLDER}/.babelrc" ]; then
+    echo "Creating link: package.json -> ${PLATFORM_FOLDER}/package.json.orig"
+    ln -sf ${PLATFORM_FOLDER}/package.json.orig package.json
 
-  echo "Creating link: yarn.lock -> ${PLATFORM_FOLDER}/yarn.lock"
-  ln -sf ${PLATFORM_FOLDER}/yarn.lock yarn.lock
+    echo "Creating link: yarn.lock -> ${PLATFORM_FOLDER}/yarn.lock"
+    ln -sf ${PLATFORM_FOLDER}/yarn.lock yarn.lock
 
-  echo "Creating link: VERSION -> ${PLATFORM_FOLDER}/VERSION"
-  ln -sf ${PLATFORM_FOLDER}/VERSION VERSION
+    echo "Creating link: VERSION -> ${PLATFORM_FOLDER}/VERSION"
+    ln -sf ${PLATFORM_FOLDER}/VERSION VERSION
 
-  echo "Creating link: .babelrc -> ${PLATFORM_FOLDER}/.babelrc"
-  ln -sf ${PLATFORM_FOLDER}/.babelrc .babelrc
+    echo "Creating link: .babelrc -> ${PLATFORM_FOLDER}/.babelrc"
+    ln -sf ${PLATFORM_FOLDER}/.babelrc .babelrc
 
-  echo "Creating link: .babelrc -> ${PLATFORM_FOLDER}/.babelrc"
-  ln -sf ${PLATFORM_FOLDER}/metro.config.js metro.config.js
+    echo "Creating link: metro.config.js -> ${PLATFORM_FOLDER}/metro.config.js"
+    ln -sf ${PLATFORM_FOLDER}/metro.config.js metro.config.js
+  fi
 fi
 
-yarn install --frozen-lockfile
-
 case $1 in
-  android)
-    set -e
-    if [ ! -d $GIT_ROOT/node_modules/react-native/android/com/facebook/react/react-native/ ]; then
-      cd $GIT_ROOT/android && ./gradlew react-native-android:installArchives
-    fi
-    ;;
   ios)
+    yarn install --frozen-lockfile
+
     targetBasename='Statusgo.framework'
     # Compare target folder with source to see if copying is required
     if [ -d "$RCTSTATUS_DIR/$targetBasename" ] && \
