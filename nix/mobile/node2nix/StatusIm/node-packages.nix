@@ -6344,13 +6344,13 @@ let
         sha512 = "JHwX0zobeYqCAwdSffRoivXeqlZR54WpCj8ICGcoNh7bvOh8khr63zvNk+fcqdRH3eI9Jhglygswijza0f3D4Q==";
       };
     };
-    "react-native-dialogs-1.0.2" = {
+    "react-native-dialogs-1.0.4" = {
       name = "react-native-dialogs";
       packageName = "react-native-dialogs";
-      version = "1.0.2";
+      version = "1.0.4";
       src = fetchurl {
-        url = "https://registry.npmjs.org/react-native-dialogs/-/react-native-dialogs-1.0.2.tgz";
-        sha512 = "3hH6s67RD6w9MVttqWARnto3wnmSgnwPCzsk4aVaQbFjtgVZQecn+oP+jqj01G6OvxAtuG7aSe62fYGs5xileA==";
+        url = "https://registry.npmjs.org/react-native-dialogs/-/react-native-dialogs-1.0.4.tgz";
+        sha512 = "Q3e4bAPp13jnPkStKYzyE/pb6xVY1spSlGHzq3zljV7uMXqFHjuTBRiM/qfm2bSZplR/znzVS/y2TtcW+1aufQ==";
       };
     };
     "react-native-dismiss-keyboard-1.0.0" = {
@@ -8604,7 +8604,7 @@ let
     name = "StatusIm";
     packageName = "StatusIm";
     version = "0.0.1";
-    src = ../../../mobile_files;
+    src = ../../../../mobile_files;
     dependencies = [
       sources."@babel/code-frame-7.0.0"
       (sources."@babel/core-7.4.5" // {
@@ -9630,7 +9630,7 @@ let
       sources."react-native-camera-git+https://github.com/status-im/react-native-camera.git#v1.1.5-1-status"
       sources."react-native-config-git+https://github.com/status-im/react-native-config.git#0.11.2-1"
       sources."react-native-crypto-2.1.1"
-      sources."react-native-dialogs-1.0.2"
+      sources."react-native-dialogs-1.0.4"
       sources."react-native-dismiss-keyboard-1.0.0"
       sources."react-native-drawer-layout-1.3.2"
       sources."react-native-drawer-layout-polyfill-1.3.2"
@@ -10124,7 +10124,7 @@ let
     buildInputs = globalBuildInputs;
     meta = {
     };
-    production = false;
+    production = true;
     bypassCache = true;
     reconstructLock = true;
   };

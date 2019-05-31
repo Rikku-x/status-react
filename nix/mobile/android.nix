@@ -58,22 +58,41 @@ let
             root = src;
           })
       src;
-  node2nix = import ./node2nix { inherit pkgs nodejs; };
-  nodePackage = node2nix.package.override(oldAttrs: (realmOverrides oldAttrs) // { });
+  developmentNodePackages = import ./node2nix/development { inherit pkgs nodejs; };
+  projectNodePackage = import ./node2nix/StatusIm { inherit pkgs nodejs; };
+  nodePackage = projectNodePackage.package.override(oldAttrs: (realmOverrides oldAttrs));
   nodeProjectName = "StatusIm";
 
-  realmOverrides = import ./realm { inherit nodeProjectName fetchurl; inherit (pkgs.nodePackages) node-pre-gyp; };
+  realmOverrides = import ./realm-overrides { inherit nodeProjectName fetchurl; };
 
   mavenLocalRepos = import ./gradle/maven-repo.nix { inherit stdenv callPackage; };
 
   jsc-filename = "jsc-android-236355.1.1";
   react-native-deps = callPackage ./gradle/reactnative-android-native-deps.nix { inherit jsc-filename; };
 
+  androidEnvShellHook = ''
+    export JAVA_HOME="${openjdk}"
+    export ANDROID_HOME="${licensedAndroidEnv}"
+    export ANDROID_SDK_ROOT="$ANDROID_HOME"
+    export ANDROID_NDK_ROOT="${androidComposition.androidsdk}/libexec/android-sdk/ndk-bundle"
+    export ANDROID_NDK_HOME="$ANDROID_NDK_ROOT"
+    export ANDROID_NDK="$ANDROID_NDK_ROOT"
+    export PATH="$ANDROID_HOME/bin:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools:$PATH"
+
+    # This avoids RN trying to download dependencies. Maybe we need to wrap this in a special RN environment derivation
+    export REACT_NATIVE_DEPENDENCIES="${react-native-deps}/deps"
+
+    for f in package.json .babelrc VERSION metro.config.js
+    do
+      rm -f $f && ln -s ./mobile_files/$f
+    done
+  '';
+
   # fake build to pre-download deps into fixed-output derivation
   deps = stdenv.mkDerivation {
     name = "gradle-install-android-archives";
     inherit src;
-    buildInputs = [ gradle bash git perl zlib ];
+    buildInputs = [ gradle bash git perl zlib ] ++ (builtins.attrValues developmentNodePackages);
     unpackPhase = ''
       cp -a $src/* .
       chmod -R u+w android
@@ -88,10 +107,10 @@ let
       cp -a ${nodePackage}/lib/node_modules/${nodeProjectName}/node_modules .
       chmod u+w -R ./node_modules/react-native
 
-      ln -s mobile_files/package.json
-      ln -s mobile_files/.babelrc
-      ln -s mobile_files/VERSION
-      ln -s mobile_files/metro.config.js
+      for f in package.json .babelrc VERSION metro.config.js
+      do
+        rm -f $f && ln -s ./mobile_files/$f
+      done
     '';
     patchPhase = ''
       # Patch maven and google central repositories with our own local directories. This prevents the builder from downloading Maven artifacts
@@ -108,26 +127,26 @@ let
         --replace "prepareJSC(dependsOn: downloadJSC)" "prepareJSC(dependsOn: createNativeDepsDirectories)" \
         --replace "def jscTar = tarTree(downloadJSC.dest)" "def jscTar = tarTree(new File(\"../../../deps/${jsc-filename}.tar.gz\"))"
 
+      # The .git directory does not exist, so no point in calling git in the script
       substituteInPlace scripts/build_no.sh \
         --replace "(git rev-parse --show-toplevel)" "STATUS_REACT_HOME"
 
-      # TODO; figure out why we get `path may not be null or empty string. path='null'`
+      # TODO: figure out why we get `path may not be null or empty string. path='null'`
       substituteInPlace node_modules/react-native/ReactAndroid/release.gradle \
         --replace "classpath += files(project.getConfigurations().getByName(\"compile\").asList())" ""
+
+      # HACK: Run what would get executed in the `prepare` script (though index.js.flow will be missing)
+      (cd ./node_modules/react-native-firebase && \
+       chmod u+w -R . && \
+       mkdir ./dist && \
+       genversion ./src/version.js && \
+       cp -R ./src/* ./dist && \
+       chmod u-w -R .) || exit
     '';
-    buildPhase = ''
-      export JAVA_HOME="${openjdk}"
-      export ANDROID_HOME="${licensedAndroidEnv}"
-      export ANDROID_SDK_ROOT="$ANDROID_HOME"
-      export ANDROID_NDK_ROOT="${androidComposition.androidsdk}/libexec/android-sdk/ndk-bundle"
-      export ANDROID_NDK_HOME="$ANDROID_NDK_ROOT"
-      export ANDROID_NDK="$ANDROID_NDK_ROOT"
-      export PATH="$ANDROID_HOME/bin:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools:$PATH"
-
-      export REACT_NATIVE_DEPENDENCIES="$(pwd)/deps"
-
-      ${status-go.shellHook}
-
+    buildPhase = 
+      androidEnvShellHook +
+      status-go.shellHook + ''
+      export REACT_NATIVE_DEPENDENCIES="$(pwd)/deps" # Use local writable deps, otherwise (for some unknown reason) gradle will fail copying directly from the nix store
       export GRADLE_USER_HOME=$(mktemp -d)
       ( cd android
         LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${stdenv.lib.makeLibraryPath [ zlib ]} \
@@ -146,9 +165,8 @@ let
     '';
     dontPatchELF = true; # The ELF types are incompatible with the host platform, so let's not even try
     noAuditTmpdir = true;
-    # TODO: see if this is actually needed to take src file hashes into account
     outputHashAlgo = "sha256";
-    outputHashMode = "recursive";
+    outputHashMode = "recursive"; # Take whole sources into consideration when calculating sha
   };
 
 in
@@ -156,23 +174,10 @@ in
     inherit androidComposition;
 
     buildInputs = [ deps openjdk gradle ];
-    shellHook = ''
-      export JAVA_HOME="${openjdk}"
-      export ANDROID_HOME="${licensedAndroidEnv}"
-      export ANDROID_SDK_ROOT="$ANDROID_HOME"
-      export ANDROID_NDK_ROOT="${androidComposition.androidsdk}/libexec/android-sdk/ndk-bundle"
-      export ANDROID_NDK_HOME="$ANDROID_NDK_ROOT"
-      export ANDROID_NDK="$ANDROID_NDK_ROOT"
-      export PATH="$ANDROID_HOME/bin:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools:$PATH"
-
+    shellHook =
+      androidEnvShellHook + ''
       $STATUS_REACT_HOME/scripts/generate-keystore.sh
 
-      rm -f package.json && ln -s mobile_files/package.json
-      rm -f .babelrc && ln -s mobile_files/.babelrc
-      rm -f VERSION && ln -s mobile_files/VERSION
-      rm -f metro.config.js && ln -s mobile_files/metro.config.js
-  '' +
-    ''
       if [ -d ./node_modules ]; then
         chmod u+w -R ./node_modules
         rm -rf ./node_modules || exit
@@ -181,9 +186,6 @@ in
       # mkdir -p node_modules # node_modules/react-native/ReactAndroid
       time cp -HR --preserve=all ${deps}/node_modules .
       echo "Done"
-
-      # This avoids RN trying to download dependencies. Maybe we need to wrap this in a special RN environment derivation
-      export REACT_NATIVE_DEPENDENCIES="${react-native-deps}/deps"
 
       rndir='node_modules/react-native'
       rnabuild="$rndir/ReactAndroid/build"
@@ -229,7 +231,6 @@ in
         mkdir -p node_modules/$p/android/build
       done
       chmod u-w node_modules
-      rm -f $STATUS_REACT_HOME/package.json && ln -s $STATUS_REACT_HOME/mobile_files/package.json
 
       export PATH="$PATH:${deps}/node_modules/.bin"
     '';

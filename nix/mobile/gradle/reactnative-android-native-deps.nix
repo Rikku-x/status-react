@@ -39,7 +39,7 @@ let
       mkdir -p $out/deps
       cd $out/deps
       for i in $srcs; do
-          unpackFile "$i"
+        unpackFile "$i"
       done
       cp $jsc $out/deps/${jsc-filename}.tar.gz # do the work of downloadJSC
       cd ..

@@ -1,4 +1,4 @@
-{ fetchurl, node-pre-gyp,
+{ fetchurl,
   nodeProjectName }:
 
 let
@@ -24,7 +24,6 @@ let
   #   "$out/lib/node_modules/${nodeProjectName}/node_modules/realm/compiled/node-v57_linux_x64/realm.node";
 
 in oldAttrs: {
-  buildInputs = oldAttrs.buildInputs ++ [ node-pre-gyp ];
   reconstructLock = true;
   preRebuild = ''
     # Do not attempt to do any http calls!

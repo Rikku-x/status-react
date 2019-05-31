@@ -5450,10 +5450,10 @@ react-native-crypto@2.1.1:
     pbkdf2 "3.0.8"
     public-encrypt "^4.0.0"
 
-react-native-dialogs@1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/react-native-dialogs/-/react-native-dialogs-1.0.2.tgz#d16d68cecbd57f74904fb2d58fd846622d5fec9a"
-  integrity sha512-3hH6s67RD6w9MVttqWARnto3wnmSgnwPCzsk4aVaQbFjtgVZQecn+oP+jqj01G6OvxAtuG7aSe62fYGs5xileA==
+react-native-dialogs@1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/react-native-dialogs/-/react-native-dialogs-1.0.4.tgz#c3bcee4a8a4ca2e97131bd5ffaed8db6ab1dec48"
+  integrity sha512-Q3e4bAPp13jnPkStKYzyE/pb6xVY1spSlGHzq3zljV7uMXqFHjuTBRiM/qfm2bSZplR/znzVS/y2TtcW+1aufQ==
 
 react-native-dismiss-keyboard@1.0.0:
   version "1.0.0"
