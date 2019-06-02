@@ -1,15 +1,16 @@
 (ns ^{:doc "Definition of the StatusMessage protocol"}
  status-im.transport.message.core
-  (:require [re-frame.core :as re-frame]
-            [goog.object :as o]
+  (:require [goog.object :as o]
+            [re-frame.core :as re-frame]
             [status-im.chat.models.message :as models.message]
-            [status-im.utils.config :as config]
+            [status-im.contact.device-info :as device-info]
             [status-im.data-store.transport :as transport-store]
+            [status-im.ethereum.core :as ethereum]
             [status-im.transport.message.contact :as contact]
             [status-im.transport.message.protocol :as protocol]
             [status-im.transport.message.transit :as transit]
             [status-im.transport.utils :as transport.utils]
-            [status-im.contact.device-info :as device-info]
+            [status-im.utils.config :as config]
             [status-im.utils.fx :as fx]
             [taoensso.timbre :as log]))
 
@@ -36,7 +37,7 @@
          dedup-id :id
          raw-payload :raw-payload} (unwrap-message js-message)
         status-message (-> payload
-                           transport.utils/to-utf8
+                           ethereum/hex-to-utf8
                            transit/deserialize)]
     (when (and sig
                status-message
