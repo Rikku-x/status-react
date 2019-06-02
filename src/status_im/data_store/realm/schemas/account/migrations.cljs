@@ -417,3 +417,7 @@
     (when mailserver-topic
       (aset mailserver-topic "chat-ids" chat-ids-str))))
 
+(defn v46
+  "Migrate user-statuses"
+  [old-realm new-realm]
+  (log/debug "migrating v46 account database"))

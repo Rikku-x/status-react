@@ -51,7 +51,7 @@
                                            :content "b"
                                            :clock-value 1}])
             message (get-in actual [:db :chats "chat-id" :messages "id"])
-            status  (get-in actual [:db :chats "chat-id" :message-statuses "id" "me" :status])]
+            status  (:outgoing-status message)]
         (testing "it adds the message"
           (is message))
         (testing "it marks the message as outgoing"
