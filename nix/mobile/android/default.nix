@@ -53,7 +53,7 @@ let
       in builtins.filterSource
           (mkFilter {
             dirsToInclude = [ "android" "mobile_files" "packager" "resources" "scripts" ];
-            dirsToExclude = [ ".git" ".svn" "CVS" ".hg" ".gradle" "build" "intermediates" ];
+            dirsToExclude = [ ".git" ".svn" "CVS" ".hg" ".gradle" "build" "intermediates" "libs" "obj" ];
             filesToInclude = [ ".env" ];
             root = src;
           })
@@ -124,7 +124,7 @@ in
 
       # If these directories are missing, there will be an error later on when building with this node_modules directory:
       # What went wrong:
-      # Failed to create parent directory 'node_modules/react-native-touch-id/android/build' when creating directory '/home/pedro/src/github.com/status-im/status-react/node_modules/react-native-touch-id/android/build/intermediates/check_manifest_result/release/checkReleaseManifest/out'
+      # Failed to create parent directory 'node_modules/react-native-touch-id/android/build' when creating directory 'node_modules/react-native-touch-id/android/build/intermediates/check_manifest_result/release/checkReleaseManifest/out'
       chmod u+w node_modules
       for p in react-native-{background-timer,camera,config,dialogs,firebase,fs,http-bridge,image-resizer,image-crop-picker,keychain,languages,mail,securerandom,shake,splash-screen,status-keycard,svg,touch-id,webview,webview-bridge} \
                realm

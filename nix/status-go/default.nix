@@ -73,24 +73,28 @@ let
     });
   };
 
-  buildInputs = if target-os == "android" then [ status-go-packages.android ] else
+  buildInputs = if target-os == "android" then buildInputs-android else
                 if target-os == "ios" then [ status-go-packages.ios ] else
                 if target-os == "all" then currentHostConfig.allTargets else
                 if platform.targetDesktop then [ status-go-packages.desktop ] else
                 throw "Unexpected target platform ${target-os}";
+  buildInputs-android = lib.optional platform.targetAndroid [ status-go-packages.android ];
+  shellHook-android =
+    lib.optionalString platform.targetAndroid ''
+      # These variables are used by the Status Android Gradle build script in android/build.gradle
+      export STATUS_GO_ANDROID_LIBDIR=${status-go-packages.android}/lib
+    '';
 
 in {
-  inherit buildInputs;
+  inherit buildInputs buildInputs-android
+          shellHook-android;
 
   shellHook =
     lib.optionalString platform.targetIOS ''
       # These variables are used by the iOS build preparation section in scripts/prepare-for-platform.sh
       export RCTSTATUS_FILEPATH=${status-go-packages.ios}/lib/Statusgo.framework
     '' +
-    lib.optionalString platform.targetAndroid ''
-      # These variables are used by the Status Android Gradle build script in android/build.gradle
-      export STATUS_GO_ANDROID_LIBDIR=${status-go-packages.android}/lib
-    '' +
+    shellHook-android +
     lib.optionalString platform.targetDesktop ''
       # These variables are used by the Status Desktop CMake build script in modules/react-native-status/desktop/CMakeLists.txt
       export STATUS_GO_DESKTOP_INCLUDEDIR=${status-go-packages.desktop}/include

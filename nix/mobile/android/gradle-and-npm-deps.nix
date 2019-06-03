@@ -12,7 +12,8 @@ let
   deps = stdenv.mkDerivation {
     name = "gradle-install-android-archives-and-patch-npm-modules";
     inherit src;
-    buildInputs = [ gradle bash perl zlib ] ++ (builtins.attrValues developmentNodePackages);
+    nativeBuildInputs = builtins.attrValues developmentNodePackages;
+    buildInputs = [ gradle bash perl zlib ] ++ status-go.buildInputs-android;
     unpackPhase = ''
       runHook preUnpack
 
@@ -70,7 +71,7 @@ let
     '';
     buildPhase = 
       androidEnvShellHook +
-      status-go.shellHook + ''
+      status-go.shellHook-android + ''
       export REACT_NATIVE_DEPENDENCIES="$(pwd)/deps" # Use local writable deps, otherwise (for some unknown reason) gradle will fail copying directly from the nix store
       export GRADLE_USER_HOME="$STATUS_REACT_HOME/.gradle"
       ( cd android
