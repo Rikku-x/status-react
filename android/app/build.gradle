@@ -84,6 +84,10 @@ project.ext.react = [
     bundleConfig: "packager/config.js"
 ]
 
+configurations.all {
+    exclude group: 'com.facebook.react', module: 'react-native'
+}
+
 apply from: "../../node_modules/react-native/react.gradle"
 
 /**
@@ -248,10 +252,6 @@ android {
         main { jniLibs.srcDirs 'libs' }
         main.assets.srcDirs += '../../resources/mapview'
     }
-}
-
-configurations.all {
-    exclude group: 'com.facebook.react', module: 'react-native'
 }
 
 dependencies {
