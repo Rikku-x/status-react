@@ -16,17 +16,14 @@ let
     unpackPhase = ''
       runHook preUnpack
 
-      mkdir src
-      cp -a $src/. ./src
-      chmod u+w ./src
+      cp -a $src/. .
+      chmod u+w .
 
-      chmod -R u+w ./src/android
+      chmod -R u+w ./android
 
       # Copy fresh RN maven dependencies and make them writable, otherwise Gradle copy fails
       cp -a ${react-native-deps}/deps ./deps
       chmod -R u+w ./deps
-
-      pushd ./src
 
       # Copy fresh node_modules and adjust permissions
       rm -rf ./node_modules
@@ -39,9 +36,6 @@ let
       do
         rm -f $f && ln -s ./mobile_files/$f
       done
-
-      sourceRoot=$(pwd)
-      popd
 
       runHook postUnpack
     '';
@@ -59,7 +53,7 @@ let
       # Patch prepareJSC so that it doesn't try to download from registry
       substituteInPlace node_modules/react-native/ReactAndroid/build.gradle \
         --replace "prepareJSC(dependsOn: downloadJSC)" "prepareJSC(dependsOn: createNativeDepsDirectories)" \
-        --replace "def jscTar = tarTree(downloadJSC.dest)" "def jscTar = tarTree(new File(\"../../../../deps/${jsc-filename}.tar.gz\"))"
+        --replace "def jscTar = tarTree(downloadJSC.dest)" "def jscTar = tarTree(new File(\"../../../deps/${jsc-filename}.tar.gz\"))"
 
       # The .git directory does not exist, so no point in calling git in the script
       substituteInPlace scripts/build_no.sh \
