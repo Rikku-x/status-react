@@ -147,7 +147,7 @@ let
       androidEnvShellHook +
       status-go.shellHook + ''
       export REACT_NATIVE_DEPENDENCIES="$(pwd)/deps" # Use local writable deps, otherwise (for some unknown reason) gradle will fail copying directly from the nix store
-      export GRADLE_USER_HOME=$(mktemp -d)
+      export GRADLE_USER_HOME="$STATUS_REACT_HOME/.gradle"
       ( cd android
         LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${stdenv.lib.makeLibraryPath [ zlib ]} \
           gradle --no-daemon react-native-android:installArchives
@@ -233,5 +233,6 @@ in
       chmod u-w node_modules
 
       export PATH="$PATH:${deps}/node_modules/.bin"
+      export GRADLE_USER_HOME="$STATUS_REACT_HOME/.gradle" # Assign our own Gradle cache location, so that other non-Nix projects don't pollute our environment
     '';
   }
