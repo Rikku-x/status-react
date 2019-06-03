@@ -102,6 +102,10 @@ def pkgFind(glob) {
 }
 
 def installJSDeps(platform) {
+  if (platform == 'android') {
+    return
+  }
+
   def attempt = 1
   def maxAttempts = 10
   def installed = false

@@ -69,8 +69,10 @@ def prep(type = 'nightly') {
   if (env.TARGET_OS == 'macos' || env.TARGET_OS == 'linux' || env.TARGET_OS == 'windows') {
     prepareTarget='desktop'
   }
-  /* node deps, pods, and status-go download */
-  utils.nix.shell("scripts/prepare-for-platform.sh ${prepareTarget}", pure: false)
+  if (env.TARGET_OS != 'android') {
+    /* node deps, pods, and status-go download */
+    utils.nix.shell("scripts/prepare-for-platform.sh ${prepareTarget}", pure: false)
+  }
 }
 
 return this

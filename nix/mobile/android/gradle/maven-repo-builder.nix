@@ -1,7 +1,7 @@
-{ stdenv, lib, fetchurl }:
+{ stdenvNoCC, lib, fetchurl }:
 
 # Put the downloaded plugins in a fake Maven repository
-name: source: stdenv.mkDerivation {
+name: source: stdenvNoCC.mkDerivation {
   name = "fake-maven-repo-${name}";
   buildCommand = ''
     mkdir -p $out

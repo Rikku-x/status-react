@@ -1,12 +1,12 @@
-{ stdenv, lib, callPackage,
+{ stdenv, stdenvNoCC, lib, callPackage,
   gradle, bash, perl, status-go, zlib,
   src, nodeProjectName, projectNodePackage, androidEnvShellHook, developmentNodePackages }:
 
 let
-  mavenLocalRepos = import ./gradle/maven-repo.nix { inherit stdenv callPackage; };
+  mavenLocalRepos = import ./gradle/maven-repo.nix { inherit stdenvNoCC callPackage; };
 
   jsc-filename = "jsc-android-236355.1.1";
-  react-native-deps = callPackage ./gradle/reactnative-android-native-deps.nix { inherit jsc-filename; };
+  react-native-deps = callPackage ./gradle/reactnative-android-native-deps.nix { inherit stdenvNoCC jsc-filename; };
 
   # fake build to pre-download deps into fixed-output derivation
   deps = stdenv.mkDerivation {

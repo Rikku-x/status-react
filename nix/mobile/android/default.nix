@@ -1,4 +1,4 @@
-{ config, stdenv, callPackage,
+{ config, stdenv, stdenvNoCC, callPackage,
   pkgs, androidenv, fetchurl, openjdk, nodejs, bash, gradle, perl, zlib,
   status-go, nodeProjectName, projectNodePackage, developmentNodePackages }:
 
@@ -59,7 +59,7 @@ let
           })
       src;
 
-  gradleAndNodeDeps = callPackage ./gradle-and-npm-deps.nix { inherit gradle bash perl zlib src nodeProjectName androidEnvShellHook projectNodePackage developmentNodePackages status-go; };
+  gradleAndNodeDeps = callPackage ./gradle-and-npm-deps.nix { inherit stdenvNoCC gradle bash perl zlib src nodeProjectName androidEnvShellHook projectNodePackage developmentNodePackages status-go; };
 
   androidEnvShellHook = ''
     export JAVA_HOME="${openjdk}"

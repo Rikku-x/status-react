@@ -1,7 +1,7 @@
-{ stdenv, callPackage }:
+{ stdenvNoCC, callPackage }:
 
 let
-  fakeMavenRepoBuilder = callPackage ./maven-repo-builder.nix { inherit stdenv; };
+  fakeMavenRepoBuilder = callPackage ./maven-repo-builder.nix { inherit stdenvNoCC; };
   makeFakeMavenRepo = srcName: source: fakeMavenRepoBuilder "${srcName}-maven-deps" source;
   sources = {
     "StatusIm" = import ./StatusIm { };
@@ -23,4 +23,4 @@ let
     "realm" = import ./realm { };
   };
 
-in stdenv.lib.mapAttrs makeFakeMavenRepo sources
+in stdenvNoCC.lib.mapAttrs makeFakeMavenRepo sources

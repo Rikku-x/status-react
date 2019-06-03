@@ -50,8 +50,8 @@ do
         echo "  \"$depurl\" = {
     host = $host;
     path = \"$deppath\";
-    pom-sha256 = \"$pom_sha256\";
     type = \"$type\";
+    pom-sha256 = \"$pom_sha256\";
     jar-sha256 = \"$jar_sha256\";
   };"
     fi

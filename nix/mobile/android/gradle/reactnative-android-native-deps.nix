@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, jsc-filename }:
+{ stdenvNoCC, fetchurl, jsc-filename }:
 
 let
   react-native-deps-sources = [
@@ -26,7 +26,7 @@ let
       sha256 = "1q6ihk2asbx95a56kmyqwysq1x3grrw9jwqllafaidf0l84f903m";
     }
   ];
-  react-native-deps = stdenv.mkDerivation {
+  react-native-deps = stdenvNoCC.mkDerivation {
     name = "react-native-deps";
     srcs = builtins.map (d: (fetchurl { inherit (d) url sha256; })) react-native-deps-sources;
     jsc = fetchurl {
