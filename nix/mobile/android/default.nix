@@ -80,7 +80,7 @@ in
       androidEnvShellHook + 
       gradleAndNodeDeps.shellHook + ''
       $STATUS_REACT_HOME/scripts/generate-keystore.sh
-      nodeModulesDir="$STATUS_REACT_HOME/node_modules'
+      nodeModulesDir="$STATUS_REACT_HOME/node_modules"
     '' +
     # Check if we need to copy node_modules (e.g. in case it has been modified after last copy)
     ''
