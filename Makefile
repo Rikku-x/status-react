@@ -100,11 +100,13 @@ prod-build:
 
 prod-build-android: export TARGET_OS ?= android
 prod-build-android:
-	lein prod-build-android
+	lein prod-build-android && \
+	node prepare-modules.js
 
 prod-build-ios: export TARGET_OS ?= ios
 prod-build-ios:
-	lein prod-build-ios
+	lein prod-build-ios && \
+    node prepare-modules.js
 
 prod-build-desktop: export TARGET_OS ?= $(HOST_OS)
 prod-build-desktop:
