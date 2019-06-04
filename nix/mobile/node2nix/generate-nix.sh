@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-GIT_ROOT=$(git rev-parse --show-toplevel)
+GIT_ROOT=$(cd "${BASH_SOURCE%/*}" && git rev-parse --show-toplevel)
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
 toolversion="${GIT_ROOT}/scripts/toolversion"
 supplement_json=$SCRIPTPATH/StatusIm/package.json

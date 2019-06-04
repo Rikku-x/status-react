@@ -5,7 +5,7 @@
 # Prerequisites: Node, npm, and node2nix (installed with npm i -g https://github.com/svanderburg/node2nix)
 #
 
-GIT_ROOT=$(git rev-parse --show-toplevel)
+GIT_ROOT=$(cd "${BASH_SOURCE%/*}" && git rev-parse --show-toplevel)
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
 toolversion="${GIT_ROOT}/scripts/toolversion"
 dir="$SCRIPTPATH"

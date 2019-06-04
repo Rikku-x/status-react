@@ -25,7 +25,7 @@ pipeline {
   stages {
     stage('Setup') {
       steps {
-        sh 'scripts/setup'
+        sh 'status-react/scripts/setup'
         sh """
           . ~/.nix-profile/etc/profile.d/nix.sh && \
           nix-env -i openssh
