@@ -108,7 +108,7 @@ in {
 
     for f in package.json .babelrc VERSION metro.config.js
     do
-      rm -f $f && ln -s ./mobile_files/$f
+      rm -f $STATUS_REACT_HOME/$f && ln -s $STATUS_REACT_HOME/mobile_files/$f $STATUS_REACT_HOME/$f
     done
 
     export PATH="$PATH:${deps}/node_modules/.bin"

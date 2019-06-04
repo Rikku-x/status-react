@@ -80,36 +80,37 @@ in
       androidEnvShellHook + 
       gradleAndNodeDeps.shellHook + ''
       $STATUS_REACT_HOME/scripts/generate-keystore.sh
+      nodeModulesDir="$STATUS_REACT_HOME/node_modules'
     '' +
     # Check if we need to copy node_modules (e.g. in case it has been modified after last copy)
     ''
       needCopyModules=1
-      if [ -d ./node_modules ]; then
-        if [ -f ./node_modules/.copied ]; then
+      if [ -d $nodeModulesDir ]; then
+        if [ -f $nodeModulesDir/.copied ]; then
           echo "Checking for modifications in node_modules..."
-          modifiedFiles=$(find ./node_modules -writable -type f -newer ./node_modules/.copied)
+          modifiedFiles=$(find $nodeModulesDir -writable -type f -newer $nodeModulesDir/.copied)
           if [ $? -eq 0 ] && [ -z "$modifiedFiles" ]; then
             needCopyModules=0
             echo "No modifications detected."
           fi
         fi
         if [ $needCopyModules -eq 1 ]; then
-          chmod u+w -R ./node_modules
-          rm -rf ./node_modules || exit
+          chmod u+w -R $nodeModulesDir
+          rm -rf $nodeModulesDir || exit
         fi
       fi
-      if [ ! -d ./node_modules ]; then
+      if [ ! -d $nodeModulesDir ]; then
         echo "Copying node_modules from Nix store (${gradleAndNodeDeps.deps}/node_modules)..."
         time cp -HR --preserve=all ${gradleAndNodeDeps.deps}/node_modules . && \
-          chmod u+w ./node_modules && \
-          touch ./node_modules/.copied && \
-          chmod u-w ./node_modules
+          chmod u+w $nodeModulesDir && \
+          touch $nodeModulesDir/.copied && \
+          chmod u-w $nodeModulesDir
         echo "Done"
       fi
     '' +
     # Fix permissions in certain directories so that React Native doesn't have a fit
     ''
-      rndir='node_modules/react-native'
+      rndir="$nodeModulesDir/react-native"
       rnabuild="$rndir/ReactAndroid/build"
       chmod u+w -R $rnabuild
       chmod 744 $rndir/scripts/.packager.env \
@@ -125,13 +126,14 @@ in
       # If these directories are missing, there will be an error later on when building with this node_modules directory:
       # What went wrong:
       # Failed to create parent directory 'node_modules/react-native-touch-id/android/build' when creating directory 'node_modules/react-native-touch-id/android/build/intermediates/check_manifest_result/release/checkReleaseManifest/out'
-      chmod u+w node_modules
-      for p in react-native-{background-timer,camera,config,dialogs,firebase,fs,http-bridge,image-resizer,image-crop-picker,keychain,languages,mail,securerandom,shake,splash-screen,status-keycard,svg,touch-id,webview,webview-bridge} \
-               realm
+      chmod u+w $nodeModulesDir
+      for p in $nodeModulesDir/react-native-{background-timer,camera,config,dialogs,firebase,fs,http-bridge,image-resizer,image-crop-picker,keychain,languages,mail,securerandom,shake,splash-screen,status-keycard,svg,touch-id,webview,webview-bridge} \
+               $nodeModulesDir/realm
       do
-        chmod -R u+w node_modules/$p
-        mkdir -p node_modules/$p/android/build
+        chmod -R u+w $p
+        mkdir -p $p/android/build
       done
-      chmod u-w node_modules
+      chmod u-w $nodeModulesDir
+      unset nodeModulesDir
     '';
   }
