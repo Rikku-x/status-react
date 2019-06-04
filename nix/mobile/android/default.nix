@@ -134,6 +134,7 @@ in
         mkdir -p $p/android/build
       done
       chmod u-w $nodeModulesDir
+      [ -n "$JENKINS_URL" ] && chmod -r u+w $nodeModulesDir # HACK: Allow CI to clean node_modules, will need to rethink this later
       unset nodeModulesDir
     '';
   }
